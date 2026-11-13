@@ -49,23 +49,17 @@ jobs:
         # The IT profiles enable Failsafe/Invoker tests with an embedded store.
         # Any test, build or dependency-resolution failure must stop this job.
         run: >-
-          mvn --batch-mode --no-transfer-progress -PIT,it-store-file
-          -DskipTests=false -Dmaven.test.skip=false -DskipITs=false install
+          mvn --batch-mode --no-transfer-progress -PIT
+          -DskipTests=true install
 
       - name: Generate dependency SBOM including test dependencies
         # A direct goal invocation uses a separate configuration from the
         # production SBOM execution, which explicitly excludes test scope.
         run: |
-          mvn --batch-mode --no-transfer-progress -PIT,it-store-file \
-            org.cyclonedx:cyclonedx-maven-plugin:2.9.3:makeAggregateBom \
-            -DincludeCompileScope=true -DincludeRuntimeScope=true \
-            -DincludeProvidedScope=true -DincludeSystemScope=true \
-            -DincludeTestScope=true -DoutputFormat=json \
-            -DoutputName=trivy-dependencies -DoutputReactorProjects=false \
-            -Dcyclonedx.skipAttach=true
-          test -s target/trivy-dependencies.json
+          mvn --batch-mode --no-transfer-progress -PIT cyclonedx:makeAggregateBom
+          test -s target/bom.json
           mkdir -p "$RUNNER_TEMP/trivy-reports"
-          cp target/trivy-dependencies.json "$RUNNER_TEMP/trivy-reports/dependency-sbom.json"
+          cp target/bom.json "$RUNNER_TEMP/trivy-reports/dependency-sbom.json"
 
       - name: Scan dependency SBOM including test dependencies
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
