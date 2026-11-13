@@ -44,14 +44,6 @@ jobs:
           cache: maven
           cache-dependency-path: "**/pom.xml"
 
-      - name: Build modules and run unit and integration tests
-        # Install sibling modules and resolve dependencies, including test scope.
-        # The IT profiles enable Failsafe/Invoker tests with an embedded store.
-        # Any test, build or dependency-resolution failure must stop this job.
-        run: >-
-          mvn --batch-mode --no-transfer-progress -PIT
-          -DskipTests=true install
-
       - name: Generate dependency SBOM including test dependencies
         # A direct goal invocation uses a separate configuration from the
         # production SBOM execution, which explicitly excludes test scope.
