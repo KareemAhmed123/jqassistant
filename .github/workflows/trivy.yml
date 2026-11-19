@@ -59,7 +59,7 @@ jobs:
           TRIVY_INCLUDE_DEV_DEPS: "true"
         with:
           scan-type: sbom
-          scan-ref: target/trivy-dependencies.json
+          scan-ref: ${{ runner.temp }}/trivy-reports/dependency-sbom.json
           scanners: vuln
           severity: HIGH,CRITICAL
           ignore-unfixed: false
